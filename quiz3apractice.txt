@@ -1,0 +1,40 @@
+//declarations
+Semaphore[] permToProcess = { new Semaphore(0), new Semaphore(0), new Semaphore(0) } ;
+Semaphore[] doneProcessing = { new Semaphore(0), new Semaphore(0), new Semaphore(0) } ;
+Semaphore[] station = { new Semaphore(1), new Semaphore(1), new Semaphore(1) };
+
+
+thread Car: {
+	station[0].acquire();
+	permToProcess[0].release();
+	// wait for machine at station 0 to finish working
+	MachineAtStation(0);
+	doneProcessing[0].acquire();
+	station[1].acquire();
+	
+	station[0].release();
+	permToProcess[1].release();
+	// wait for machine at station 1 to finish working
+	MachineAtStation(1);
+	doneProcessing[1].acquire();
+	station[2].acquire();
+
+	station[1].release();
+	permToProcess[2].release();
+	// wait for machine at station 2 to finish working
+	MachineAtStation(2);
+	doneProcessing[2].acquire();
+	station[2].release();
+
+
+
+
+}
+
+thread MachineAtStation(i): {
+	while (true) {
+		permToProcess[i].acquire();
+		// process vehicle
+		doneProcessing[i].release();
+	}
+}

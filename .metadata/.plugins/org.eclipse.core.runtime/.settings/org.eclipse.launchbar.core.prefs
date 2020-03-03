@@ -1,0 +1,13 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:TextSwap (1),org.eclipse.launchbar.core.descriptorType.default\:TextSwap,org.eclipse.launchbar.core.descriptorType.default\:BarrierExample.Barrier,org.eclipse.launchbar.core.descriptorType.default\:Pizza,org.eclipse.launchbar.core.descriptorType.default\:Assignment2,org.eclipse.launchbar.core.descriptorType.default\:Assignment2 (1)
+eclipse.preferences.version=1
+org.eclipse.launchbar.core.descriptorType.default\:Assignment2\ (1)/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:Assignment2\ (1)/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:BarrierExample.Barrier/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:BarrierExample.Barrier/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:TextSwap\ (1)/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:TextSwap\ (1)/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:TextSwap/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:TextSwap/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local

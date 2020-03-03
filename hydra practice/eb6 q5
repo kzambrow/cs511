@@ -1,0 +1,19 @@
+monitor myBarrier {
+int counter = 0;
+final static int N = 3;
+condition barrier;
+
+synchronize() {
+	counter++;
+	while (counter<N) {
+	barrier.wait();
+	}
+
+	while //implement
+ 	// implement
+	barrier.signal();
+		
+}
+
+}
+}

@@ -1,0 +1,148 @@
+//Kamil Zambrowski
+//I Pledge My Honor That I Have Abided By The Stevens Honor System
+
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
+public class Gym {
+	private static final int GYM_SIZE = 30;
+	private static final int GYM_REGISTERED_CLIENTS = 10000;
+	private Map<WeightPlateSize,Integer> noOfWeightPlates;
+	private Set<Integer> clients; // for getting fresh client ids
+	private ExecutorService executor;
+	// number of plates for each weight
+	private static final int NUM_SMALL = 110;
+	private static final int NUM_MED = 90;
+	private static final int NUM_LARGE = 75;
+	
+	//Mutex for client ID
+	final static Semaphore cmutex = new Semaphore(1);
+	
+	// Semaphores for each gym apparatus (5 in a gym)
+	final static Semaphore atmutex = new Semaphore(1);
+	final static Semaphore LEGPRESSMACHINE = new Semaphore(5);
+	final static Semaphore BARBELL = new Semaphore(5);
+	final static Semaphore HACKSQUATMACHINE = new Semaphore(5);
+	final static Semaphore LEGEXTENSIONMACHINE = new Semaphore(5);
+	final static Semaphore LEGCURLMACHINE = new Semaphore(5);
+	final static Semaphore LATPULLDOWNMACHINE = new Semaphore(5);
+	final static Semaphore PECDECKMACHINE = new Semaphore(5);
+	final static Semaphore CABLECROSSOVERMACHINE = new Semaphore(5);
+	
+	// Semaphore for acquiring and releasing plates
+	final static Semaphore pmutex = new Semaphore(1);
+	final static Semaphore large_plate = new Semaphore(NUM_LARGE);
+	final static Semaphore med_plate = new Semaphore(NUM_MED);
+	final static Semaphore small_plate = new Semaphore(NUM_SMALL);
+	final static Semaphore large_ticket = new Semaphore(1);
+	final static Semaphore med_ticket = new Semaphore(1);
+	final static Semaphore small_ticket = new Semaphore(1);
+	
+	public Client newClient() {
+		Random r = new Random();
+		Integer CID = new Integer(10000);
+		try {
+			cmutex.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while(clients.contains(CID)) {
+			CID = new Integer (r.nextInt(10000) + 1);
+		}
+		clients.add(CID);
+		cmutex.release();
+		return Client.generateRandom(CID);
+	}
+	
+	public void enterGym(Client client) {
+		System.out.println(client.getID() + " entered the gym.");
+		List<Exercise> routine = client.getRoutine();
+		
+	}
+	
+	public void useApparatus(int id, ApparatusType at, Map<WeightPlateSize, Integer> weight, int duration) {
+		Semaphore temp = null;
+		if (at == ApparatusType.LEGPRESSMACHINE) {
+			temp = LEGPRESSMACHINE;
+		} else if (at == ApparatusType.BARBELL) {
+			temp = BARBELL;
+		} else if (at == ApparatusType.HACKSQUATMACHINE) {
+			temp = HACKSQUATMACHINE;
+		} else if (at == ApparatusType.LEGEXTENSIONMACHINE) {
+			temp = LEGEXTENSIONMACHINE;
+		} else if (at == ApparatusType.LEGCURLMACHINE) {
+			temp = LEGCURLMACHINE;
+		} else if (at == ApparatusType.LATPULLDOWNMACHINE) {
+			temp = LATPULLDOWNMACHINE;
+		} else if (at == ApparatusType.PECDECKMACHINE) {
+			temp = PECDECKMACHINE;
+		} else if (at == ApparatusType.CABLECROSSOVERMACHINE) {
+			temp = CABLECROSSOVERMACHINE;
+		}
+		try {
+			temp.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			pmutex.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//keep track of how many weights are left after using them on apparatus
+		int smallWeights = noOfWeightPlates.get(WeightPlateSize.SMALL_3KG).intValue() - weight.get(WeightPlateSize.SMALL_3KG).intValue();
+		int medWeights = noOfWeightPlates.get(WeightPlateSize.MEDIUM_5KG).intValue() - weight.get(WeightPlateSize.MEDIUM_5KG).intValue();
+		int largeWeights = noOfWeightPlates.get(WeightPlateSize.LARGE_10KG).intValue() - weight.get(WeightPlateSize.LARGE_10KG).intValue();
+		
+		noOfWeightPlates.put(WeightPlateSize.SMALL_3KG, smallWeights);
+		noOfWeightPlates.put(WeightPlateSize.MEDIUM_5KG, medWeights);
+		noOfWeightPlates.put(WeightPlateSize.LARGE_10KG, largeWeights);
+		pmutex.release();
+		
+		//client using an apparatus
+		System.out.println(id + " is using the "+ at + " with " + 
+			weight.get(WeightPlateSize.SMALL_3KG) + " Small 3kg plates, " +
+			weight.get(WeightPlateSize.MEDIUM_5KG) + " Medium 5kg plates, and " +
+			weight.get(WeightPlateSize.LARGE_10KG) + " Large 10kg plates.");
+		
+		try {
+			Thread.sleep(duration);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(id + " stopped using the "+ at + " with " + 
+				weight.get(WeightPlateSize.SMALL_3KG) + " Small 3kg plates, " +
+				weight.get(WeightPlateSize.MEDIUM_5KG) + " Medium 5kg plates, and " +
+				weight.get(WeightPlateSize.LARGE_10KG) + " Large 10kg plates.");
+		
+		//putting the weights back
+		
+		try {
+			pmutex.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		noOfWeightPlates.put(WeightPlateSize.SMALL_3KG, noOfWeightPlates.get(WeightPlateSize.SMALL_3KG) + weight.get(WeightPlateSize.SMALL_3KG));
+		noOfWeightPlates.put(WeightPlateSize.MEDIUM_5KG, noOfWeightPlates.get(WeightPlateSize.MEDIUM_5KG) + weight.get(WeightPlateSize.MEDIUM_5KG));
+		noOfWeightPlates.put(WeightPlateSize.LARGE_10KG, noOfWeightPlates.get(WeightPlateSize.LARGE_10KG) + weight.get(WeightPlateSize.LARGE_10KG));
+		pmutex.release();
+		temp.release();
+	}
+	
+	
+	
+	
+}

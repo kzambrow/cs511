@@ -1,0 +1,52 @@
+// Kamil Zambrowski, Paul Chua
+//I Pledge My Honor That I Have Abided By The Stevens Honor System
+
+
+Semaphore permToLoad = new Sempahore(0);
+Semaphore doneLoading = new Semaphore(0);
+Semaphore North-South = new Semaphore(1);
+Semaphore South-North = new Semaphore(1);
+Semaphore mutex = new Semaphore(1);
+
+
+thread PassengerTrain(i) {
+	if (i == 0) {
+	// checks if theres another train on north-south track, grab ticket
+	North-South.acquire();
+	// stops at station
+	North-South.release();
+	}
+	else (i == 1) {
+	// checks if theres another train on the south-north track, grab ticket
+	South-North.acquire();
+	// stops at station
+	South-North.release();
+}
+
+thread FreightTrain(i) {
+	// grab ticket for both north and south
+	mutex.acquire();
+	North-South.acquire();
+	South-North.acquire();
+	mutex.release();
+	
+	//run loading machine
+	permToLoad.release();
+	LoadingMachine();
+	doneLoading.acquire();	
+
+	// release ticket for both north and south
+	mutex.acquire();
+	North-South.release();
+	South-North.release();
+	mutex.release();
+}
+
+thread LoadingMachine: {
+	while (true) {
+	permToLoad.acquire();
+	// process vehicle
+	doneLoading.release();	
+
+	}
+}

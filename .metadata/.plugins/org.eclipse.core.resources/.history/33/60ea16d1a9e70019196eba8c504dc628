@@ -1,0 +1,33 @@
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+public class Client {
+	
+	private int id;
+	private List<Exercise> routine;
+	
+	public Client(int id) {
+		this.id = id;
+		routine = new ArrayList<exercise>();
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public List<Exercise> getRoutine() {
+		return routine;
+	}
+	
+	public void addExercise(Exercise e) {
+		this.routine.add(e);
+	}
+	
+	public static Client generateRandom(int id) {
+		Client temp = new Client(id);
+		Random r = new Random();
+		
+		int exerciseCount = r.nextInt(6) + 15;
+	}
+}
